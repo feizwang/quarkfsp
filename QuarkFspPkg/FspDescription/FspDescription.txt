@@ -1,0 +1,1 @@
+This is the FSP for Intel Quark SoC X1000.

@@ -1,0 +1,94 @@
+## @file
+# The INF file of FspInitPreMem PEIM.
+#
+# Copyright (c) 2015 - 2016 Intel Corporation.
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspInitPreMem
+  FILE_GUID                      = 3B8DEEBB-A3D0-4d4f-89F0-2846F3259DB1
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimFspInitPreMem
+
+[Sources]    
+  FspInitPreMem.c
+  FspInitPreMem.h
+  MrcWrapper.c
+  MrcWrapper.h
+  CommonHeader.h
+    
+[Packages]  
+  MdePkg/MdePkg.dec  
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  IntelFspPkg/IntelFspPkg.dec
+  QuarkSocPkg/QuarkSocPkg.dec
+  QuarkFspPkg/QuarkFspPkg.dec
+ 
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid            # PPI ALWAYS_CONSUMED
+  gEfiPeiStallPpiGuid                       # PPI ALWAYS_PRODUCED
+  gEfiPeiResetPpiGuid                       # PPI ALWAYS_PRODUCED
+  gQNCMemoryInitPpiGuid                         # PPI ALWAYS_CONSUMED
+  gEfiPeiReadOnlyVariable2PpiGuid               # PPI ALWAYS_CONSUMED
+
+[Guids]
+  gEfiMemoryConfigDataGuid                  # PPI ALWAYS_CONSUMED
+  gFspReservedMemoryResourceHobGuid         # PPI ALWAYS_PRODUCED
+  gFspNonVolatileStorageHobGuid             # PPI ALWAYS_PRODUCED
+  gFspSiliconFvGuid                         # PPI ALWAYS_CONSUMED
+  gFspBootLoaderTolumHobGuid                # PPI ALWAYS_PRODUCED
+  gFspSmbiosMemoryInfoHobGuid               # CONSUMES
+  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED L"AcpiGlobalVariab"
+  gEfiMemoryTypeInformationGuid                 # ALWAYS_CONSUMED L"MemoryTypeInformation"
+  gEfiSmmPeiSmramMemoryReserveGuid              # ALWAYS_PRODUCED  Hob: GUID_EXTENSION
+  gEfiMemoryOverwriteControlDataGuid            # SOMETIMES_CONSUMED
+
+[Pcd]  
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gIntelFspPkgTokenSpaceGuid.PcdFspReservedMemoryLength
+  gQuarkFspTokenSpaceGuid.PcdEccScrubBlkSize
+  gQuarkFspTokenSpaceGuid.PcdEccScrubInterval
+  gEfiQuarkSCSocIdTokenSpaceGuid.PcdIohUartFunctionNumber
+  gEfiQuarkSCSocIdTokenSpaceGuid.PcdIohUartBusNumber
+  gEfiQuarkSCSocIdTokenSpaceGuid.PcdIohUartDevNumber
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdMrcParameters
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdQuarkMicrocodeFile
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdTSegSize
+  gEfiQuarkNcSocIdTokenSpaceGuid.PcdRcbaMmioBaseAddress
+  
+[LibraryClasses]
+  #       
+  # Generic library class
+  #
+  PeimEntryPoint
+  BaseLib
+  BaseMemoryLib
+  IoLib  
+  PcdLib
+  PciLib
+  HobLib
+  PciExpressLib
+  PeiServicesLib
+  FspCommonLib
+  FspPlatformLib
+  FspSwitchStackLib
+  ResetSystemLib
+  IntelQNCLib
+  PlatformHelperLib
+  ReportStatusCodeLib
+
+[Depex]
+  TRUE

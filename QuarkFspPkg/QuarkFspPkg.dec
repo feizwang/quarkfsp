@@ -1,0 +1,112 @@
+## @file
+# DEC file of Firmware Service Package (FSP) for Intel Quark X1000 SoC.
+#
+# This package provides specific modules of FSP for Intel Quark X1000 SoC.
+# Copyright (c) 2013-2016 Intel Corporation.
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = QuarkFspPkg
+  PACKAGE_GUID                   = 46C1F476-A85E-49a8-B258-DD4396B87FEF
+  PACKAGE_VERSION                = 0.1
+
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  SEC PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
+#
+################################################################################
+[Includes]
+  Include
+
+################################################################################
+#
+# Library Class Header section - list of Library Class header files that are
+#                                provided by this package.
+#
+################################################################################
+[LibraryClasses]
+
+################################################################################
+#
+# Global Guid Definition section - list of Global Guid C Name Data Structures
+#                                  that are provided by this package.
+#
+################################################################################
+[Guids]
+  gQuarkFspTokenSpaceGuid       = { 0x1e37f8dd, 0xb16f, 0x4616, { 0x8d, 0xdb, 0xf3, 0xa7, 0xb3, 0xbc, 0xcf, 0xa0 }}
+  gEfiMemoryConfigDataGuid      = { 0x80dbd530, 0xb74c, 0x4f11, { 0x8c, 0x03, 0x41, 0x86, 0x65, 0x53, 0x28, 0x31 }}
+  gFspSiliconFvGuid             = { 0x1b5c27fe, 0xf01c, 0x4fbc, { 0xae, 0xae, 0x34, 0x1b, 0x2e, 0x99, 0x2a, 0x17 }}
+  gFspSmbiosMemoryInfoHobGuid   = { 0x01a1108c, 0x9dee, 0x4984, { 0x88, 0xc3, 0xee, 0xe8, 0xc4, 0x9e, 0xfb, 0x89 }}
+
+################################################################################
+#
+# Global Protocols Definition section - list of Global Protocols C Name Data
+#                                  Structures that are provided by this package.
+#
+################################################################################
+[Protocols]
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+
+[PcdsFeatureFlag]
+
+[PcdsFixedAtBuild]
+
+  # ECC scrub interval in miliseconds 1..255 (0 works as feature disable)
+  gQuarkFspTokenSpaceGuid.PcdEccScrubInterval|0x00|UINT8|0x20000037
+  # Number of 32B blocks read for ECC scrub 2..16
+  gQuarkFspTokenSpaceGuid.PcdEccScrubBlkSize|0x02|UINT8|0x20000038
+
+  gQuarkFspTokenSpaceGuid.PcdFspImageAttributes     | 0x00       | UINT32 | 0x0000000D
+  gQuarkFspTokenSpaceGuid.PcdFspHeaderRevision      | 0x00       | UINT32 | 0x0000000E
+  gQuarkFspTokenSpaceGuid.PcdFspImageRevision       | 0x00       | UINT32 | 0x0000000F
+  ##@note PcdFspImageIdString and PcdVpdRegionSign must be identical. Don't change one without the other.
+  gQuarkFspTokenSpaceGuid.PcdFspImageIdString       | 0x00       | UINT64 | 0x00000010
+  gQuarkFspTokenSpaceGuid.PcdFspFv1Base    |0x00000000|UINT32|0x00000011
+  gQuarkFspTokenSpaceGuid.PcdFspFv1Size    |0x00000000|UINT32|0x00000012
+  gQuarkFspTokenSpaceGuid.PcdFspFv2Base    |0x00000000|UINT32|0x00000013
+  gQuarkFspTokenSpaceGuid.PcdFspFv2Size    |0x00000000|UINT32|0x00000014
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+
+[PcdsDynamic, PcdsDynamicEx]
+  ## Provides the ability to enable the Fast Boot feature of the BIOS.  This
+  #  enables the system to boot faster but may only enumerate the hardware
+  #  that is required to boot the system.<BR>
+  #
+  # @Prompt Fast Boot Support
+  #
+  gQuarkFspTokenSpaceGuid.PcdEnableFastBoot|FALSE|BOOLEAN|0xB000004
+
+  ##@note PcdFspImageIdString and PcdVpdRegionSign must be identical. Don't change one without the other.
+  gQuarkFspTokenSpaceGuid.PcdVpdRegionSign          | 0x00       | UINT64 | 0xA00002A7
+  gQuarkFspTokenSpaceGuid.PcdImageRevision          | 0x00000000 | UINT32 | 0xA00002A8
+  gQuarkFspTokenSpaceGuid.PcdUpdRegionOffset        | 0x00000000 | UINT32 | 0xA00002A9

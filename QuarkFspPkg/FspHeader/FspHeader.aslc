@@ -1,0 +1,84 @@
+/** @file
+This is the FSP header structure
+
+Copyright (c) 2015 - 2016 Intel Corporation.
+
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include <PiPei.h>
+#include <Library/PcdLib.h>
+#include <FspInfoHeader.h>
+#include <FspPatchTable.h>
+
+#define  UINT64_TO_BYTE_ARRAY(x)  {(x),(x)>>8,(x)>>16,(x)>>24,(x)>>32,(x)>>40,(x)>>48,(x)>>56}
+
+#define FSP_PRODUCER_ID  "INTELC"
+
+FSP_INFO_HEADER mFspInfoHeader =
+{
+  FSP_INFO_HEADER_SIGNATURE,             // UINT32  Signature  (FSPH)
+  sizeof(FSP_INFO_HEADER),               // UINT32  HeaderLength;
+  {0x00, 0x00, 0x00},                    // UINT8   Reserved1[3];
+  FixedPcdGet8(PcdFspHeaderRevision),    // UINT8   HeaderRevision; 
+  FixedPcdGet32(PcdFspImageRevision),    // UINT32  ImageRevision;
+  
+  UINT64_TO_BYTE_ARRAY(
+  FixedPcdGet64(PcdFspImageIdString)),   // CHAR8   ImageId[8];
+  
+  FixedPcdGet32(PcdFspAreaSize),         // UINT32  ImageSize;
+  FixedPcdGet32(PcdFspAreaBaseAddress),  // UINT32  ImageBase;
+
+  FixedPcdGet32(PcdFspImageAttributes),  // UINT32  ImageAttribute;
+  0x12345678,                            // UINT32  CfgRegionOffset;  
+  0x12345678,                            // UINT32  CfgRegionSize;
+  0x00000006,                            // UINT32  ApiEntryNum;
+
+  0x12345678,                            // UINT32  TempRamInitEntry;
+  0x12345678,                            // UINT32  FspInitEntry;
+  0x12345678,                            // UINT32  NotifyPhaseEntry;
+  0x12345678,                            // UINT32  FspMemoryInitEntry;
+  0x12345678,                            // UINT32  TempRamExitEntry;
+  0x12345678,                            // UINT32  FspSiliconInitEntry;  
+};
+
+FSP_INFO_EXTENDED_HEADER mFspExtendedTable =
+{
+  FSP_INFO_EXTENDED_HEADER_SIGNATURE,    // UINT32  Signature  (FSPE)
+  sizeof(FSP_INFO_EXTENDED_HEADER),      // UINT32  Length;
+  FSPE_HEADER_REVISION_1,                // UINT8   Revision;
+  0x00,                                  // UINT8   Reserved;
+  {FSP_PRODUCER_ID},                     // CHAR8   FspProducerId[6];
+  0x00000001,                            // UINT32  FspProducerRevision;
+  0x00000000,                            // UINT32  FspProducerDataSize;
+};
+
+FSP_PATCH_TABLE mFspPatchTable =
+{
+  FSP_FSPP_SIGNATURE,                    // UINT32  Signature  (FSPP)
+  sizeof(FSP_PATCH_TABLE),               // UINT16  HeaderLength;
+  FSPP_HEADER_REVISION_1,                // UINT8   HeaderRevision;
+  0x00,                                  // UINT8   Reserved;
+  2,                                     // UINT32  PatchEntryNum;
+  0xFFFFFFFC,                            //  Patch FVBASE at end of FV
+  0x12345678                             //  Patch module patchable PCD VpdBase
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from
+  // removing the data structure from the executable
+  //
+  return (VOID*)&mFspInfoHeader;
+}

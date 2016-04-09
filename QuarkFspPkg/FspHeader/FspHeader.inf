@@ -1,0 +1,49 @@
+## @file
+# This is the FSP header structure.
+#
+# Copyright (c) 2015 - 2016 Intel Corporation.
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspHeader
+  FILE_GUID                      = 912740BE-2284-4734-B971-84B027353F0C
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  FspHeader.aslc
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFspPkg/IntelFspPkg.dec
+  QuarkFspPkg/QuarkFspPkg.dec
+
+[Pcd]    
+  gIntelFspPkgTokenSpaceGuid.PcdFspAreaBaseAddress
+  gIntelFspPkgTokenSpaceGuid.PcdFspAreaSize
+  gIntelFspPkgTokenSpaceGuid.PcdFspReservedMemoryLength
+  gQuarkFspTokenSpaceGuid.PcdVpdRegionSign
+  gQuarkFspTokenSpaceGuid.PcdFspImageAttributes
+  gQuarkFspTokenSpaceGuid.PcdFspHeaderRevision
+  gQuarkFspTokenSpaceGuid.PcdFspImageRevision
+  gQuarkFspTokenSpaceGuid.PcdFspImageIdString
+  gQuarkFspTokenSpaceGuid.PcdImageRevision
+  gQuarkFspTokenSpaceGuid.PcdUpdRegionOffset
+  gQuarkFspTokenSpaceGuid.PcdFspFv1Base
+  gQuarkFspTokenSpaceGuid.PcdFspFv1Size
+  gQuarkFspTokenSpaceGuid.PcdFspFv2Base
+  gQuarkFspTokenSpaceGuid.PcdFspFv2Size
+  
+[FixedPcd]
+  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPatchEntry
+  gIntelFspPkgTokenSpaceGuid.PcdFspMaxPerfEntry
