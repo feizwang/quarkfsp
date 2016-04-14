@@ -158,7 +158,7 @@ INF RuleOverride = FSPHEADER QuarkFspPkg/FspHeader/FspHeader.inf
 #
 # FSP drivers
 #
-INF IntelFspPkg\FspDxeIpl\FspDxeIpl.inf
+INF IntelFspPkg/FspDxeIpl/FspDxeIpl.inf
 
 ################################################################################
 #

@@ -365,6 +365,6 @@
   QuarkFspPkg/Platform/Pei/PlatformInit/BiosCodePostMrc.inf
 
   #
-  # FSP LPL
+  # FSP IPL
   #
   IntelFspPkg/FspDxeIpl/FspDxeIpl.inf
