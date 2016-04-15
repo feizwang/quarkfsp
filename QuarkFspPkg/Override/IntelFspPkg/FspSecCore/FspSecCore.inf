@@ -1,7 +1,7 @@
 ## @file
 #  Sec Core for FSP
 #
-#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,25 +26,25 @@
 #
 
 [Sources]
-  ../../../../IntelFspPkg/FspSecCore/SecMain.c
-  ../../../../IntelFspPkg/FspSecCore/SecMain.h
-  ../../../../IntelFspPkg/FspSecCore/SecFsp.c
-  ../../../../IntelFspPkg/FspSecCore/SecFsp.h
+  SecMain.c
+  SecMain.h
+  SecFsp.c
+  SecFsp.h
 
 [Sources.IA32]
-  ../../../../IntelFspPkg/FspSecCore/Ia32/ResetVec.asm16 | MSFT
-  ../../../../IntelFspPkg/FspSecCore/Ia32/Stack.asm  | MSFT
-  ../../../../IntelFspPkg/FspSecCore/Ia32/InitializeFpu.asm  | MSFT
+  Ia32/ResetVec.asm16 | MSFT
+  Ia32/Stack.asm  | MSFT
+  Ia32/InitializeFpu.asm  | MSFT
   Ia32/FspApiEntry.asm  | MSFT
-  ../../../../IntelFspPkg/FspSecCore/Ia32/FspHelper.asm  | MSFT
+  Ia32/FspHelper.asm  | MSFT
 
-  ../../../../IntelFspPkg/FspSecCore/Ia32/Stacks.s | GCC
-  ../../../../IntelFspPkg/FspSecCore/Ia32/InitializeFpu.s | GCC
+  Ia32/Stacks.s | GCC
+  Ia32/InitializeFpu.s | GCC
   Ia32/FspApiEntry.s | GCC
-  ../../../../IntelFspPkg/FspSecCore/Ia32/FspHelper.s | GCC
+  Ia32/FspHelper.s | GCC
 
 [Binaries.Ia32]
-  RAW|../../../../IntelFspPkg/FspSecCore/Vtf0/Bin/ResetVec.ia32.raw |GCC
+  RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC
 
 [Packages]
   MdePkg/MdePkg.dec
