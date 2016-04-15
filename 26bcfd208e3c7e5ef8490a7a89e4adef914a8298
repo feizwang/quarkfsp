@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_8ed12ed0",
+        "filename": "QuarkFspPkg/QuarkFspPkg.dsc",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-15T16:50:33Z",
+      "side": 1,
+      "message": "I\u0027m ok with this change now, but we should remove the GALILEO Gen1/Gen2 switch in the future since FSP is a chipset specific product.\n\nIn the future, the new serial port library will not initialize the serial port, this should be done by boot loader before invoking FSP.",
+      "revId": "26bcfd208e3c7e5ef8490a7a89e4adef914a8298",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
