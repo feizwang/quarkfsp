@@ -18,7 +18,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <FspInfoHeader.h>
 #include <FspPatchTable.h>
 
-#define  UINT64_TO_BYTE_ARRAY(x)  {(x),(x)>>8,(x)>>16,(x)>>24,(x)>>32,(x)>>40,(x)>>48,(x)>>56}
+#define  UINT64_TO_BYTE_ARRAY(x)  {(UINT8)(x),(UINT8)((x)>>8),(UINT8)((x)>>16),\
+                                   (UINT8)((x)>>24),(UINT8)((x)>>32), \
+                                   (UINT8)((x)>>40),(UINT8)((x)>>48), \
+                                   (UINT8)((x)>>56)}
 
 #define FSP_PRODUCER_ID  "INTELC"
 
@@ -67,8 +70,10 @@ FSP_PATCH_TABLE mFspPatchTable =
   FSPP_HEADER_REVISION_1,                // UINT8   HeaderRevision;
   0x00,                                  // UINT8   Reserved;
   2,                                     // UINT32  PatchEntryNum;
-  0xFFFFFFFC,                            //  Patch FVBASE at end of FV
-  0x12345678                             //  Patch module patchable PCD VpdBase
+  {
+    0xFFFFFFFC,                          //  Patch FVBASE at end of FV
+    0x12345678                           //  Patch module patchable PCD VpdBase
+  }
 };
 
 VOID*
