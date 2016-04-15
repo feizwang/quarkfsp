@@ -347,7 +347,7 @@ EstablishStackFsp    ENDP
 ;----------------------------------------------------------------------------
 TempRamInitApi   PROC    NEAR    PUBLIC
 ;################ Quark SoC - Start ###################
-;# TeampRamInit API is an empty API since Quark SoC does
+;# TempRamInit API is an empty API since Quark SoC does
 ;# not support CAR.
   ;
   ; Check Parameter

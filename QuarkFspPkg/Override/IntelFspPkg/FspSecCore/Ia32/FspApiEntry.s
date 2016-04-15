@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -205,6 +205,7 @@ NextAddress:
 ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamBase)
 ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdTemporaryRamSize)
 ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdFspTemporaryRamSize)
+ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdFspAreaBaseAddress)
 
 #
 # Following functions will be provided in C
@@ -537,84 +538,88 @@ ASM_PFX(EstablishStackFsp):
 #----------------------------------------------------------------------------
 ASM_GLOBAL ASM_PFX(TempRamInitApi)
 ASM_PFX(TempRamInitApi):
-  #
-  # Ensure SSE is enabled
-  #
-  ENABLE_SSE
-
-  #
-  # Save EBP, EBX, ESI, EDI & ESP in XMM7 & XMM6
-  #
-  SAVE_REGS
-
-  #
-  # Save timestamp into XMM6
-  #
-  rdtsc
-  SAVE_EAX
-  SAVE_EDX
-
+################ Quark SoC - Start ###################
+# TempRamInit API is an empty API since Quark SoC does
+# not support CAR.
   #
   # Check Parameter
   #
-  movl    4(%esp), %eax
-  cmpl    $0x00, %eax
-  movl    $0x80000002, %eax
-  jz      NemInitExit
+  movl      4(%esp), %eax
+  cmpl      $0, %eax
+  movl      $0x80000002, %eax
+  jz        TempRamInitExit
 
-  #
-  # Sec Platform Init
-  #
-  movl    $TempRamInitApiL1, %esi            #CALL_MMX  SecPlatformInit
-  movd    %esi, %mm7
-  .weak   ASM_PFX(SecPlatformInit)
-  .set    ASM_PFX(SecPlatformInit), ASM_PFX(SecPlatformInitDefault)
-  jmp     ASM_PFX(SecPlatformInit)
-TempRamInitApiL1:
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
-
-  #
-  # Load microcode
-  #
-  LOAD_ESP
-  movl    $TempRamInitApiL2, %esi            #CALL_MMX  LoadMicrocode
-  movd    %esi, %mm7
-  .weak   ASM_PFX(LoadMicrocode)
-  .set    ASM_PFX(LoadMicrocode), ASM_PFX(LoadMicrocodeDefault)
-  jmp     ASM_PFX(LoadMicrocode)
-TempRamInitApiL2:
-  SAVE_EAX_MICROCODE_RET_STATUS              #Save microcode return status in ECX-SLOT 3 in xmm6.
-  #@note If return value eax is not 0, microcode did not load, but continue and attempt to boot from ECX-SLOT 3 in xmm6.
-
-  #
   # Call Sec CAR Init
-  #
-  LOAD_ESP
-  movl    $TempRamInitApiL3, %esi            #CALL_MMX  SecCarInit
-  movd    %esi, %mm7
-  jmp     ASM_PFX(SecCarInit)
-TempRamInitApiL3:
-  cmpl    $0x00, %eax
-  jnz     NemInitExit
+  movl      SecCarInitDone, %eax
+  jmp       SecCarInit
+
+SecCarInitDone:
+  cmpl      $0, %eax
+  jnz       TempRamInitExit
 
   #
-  # EstablishStackFsp
+  # Save return address to EBP
   #
-  LOAD_ESP
-  movl    $TempRamInitApiL4, %esi            #CALL_MMX  EstablishStackFsp
-  movd    %esi, %mm7
-  jmp     ASM_PFX(EstablishStackFsp)
-TempRamInitApiL4:
+  movl      %esp, %ebp
 
-  LOAD_EAX_MICROCODE_RET_STATUS              #Restore microcode status if no CAR init error.
+  #
+  # Save parameter pointer in edx  
+  #
+  movl      4(%esp), %edx  
 
-NemInitExit:
   #
-  # Load EBP, EBX, ESI, EDI & ESP from XMM7 & XMM6
+  # Enable FSP STACK
   #
-  LOAD_REGS
+  movl      PcdGet32 (PcdTemporaryRamBase), %esp
+  addl      PcdGet32 (PcdTemporaryRamSize), %esp
+
+  pushl     DATA_LEN_OF_MCUD      # Size of the data region 
+  pushl     $0x4455434D           # Signature of the  data region 'MCUD'
+  pushl     12(%edx)              # Code size
+  pushl     8(%edx)               # Code base
+  pushl     4(%edx)               # Microcode size, 0, no ucode for Quark
+  pushl     (%edx)                # Microcode base, 0, no ucode for Quark
+
+  #
+  # Save API entry/exit timestamp into stack
+  #
+  pushl     DATA_LEN_OF_PER0     # Size of the data region 
+  pushl     $0x30524550          # Signature of the  data region 'PER0'
+  xorl      %edx, %edx
+  pushl     %edx
+  xorl      %eax, %eax
+  pushl     %eax
+  rdtsc
+  pushl     %edx
+  pushl     %eax
+
+  #
+  # Terminator for the data on stack
+  # 
+  pushl     $0
+
+  #
+  # Set ECX/EDX to the bootloader temporary memory range
+  #
+  movl      PcdGet32 (PcdTemporaryRamBase), %ecx
+  movl      %ecx, %edx
+  addl      PcdGet32 (PcdTemporaryRamSize), %edx
+  subl      PcdGet32 (PcdFspTemporaryRamSize), %edx
+
+  #
+  # Restore return address to EBP
+  #
+  movl      %ebp, %esp
+
+  # EBP - FSP_INFO_HEADER pointer
+  movl      PcdGet32 (PcdFspAreaBaseAddress), %ebp
+  addl      $0x94, %ebp          # TODO - Fixed it to 0x94
+
+  # EAX - error flag
+  xorl      %eax, %eax
+
   ret
+################ Quark SoC - End ###################
 
 
 #----------------------------------------------------------------------------
