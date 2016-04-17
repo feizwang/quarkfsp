@@ -25,6 +25,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define FSP_PRODUCER_ID  "INTELC"
 
+FSP_PATCH_TABLE mFspPatchTable =
+{
+  FSP_FSPP_SIGNATURE,                    // UINT32  Signature  (FSPP)
+  sizeof(FSP_PATCH_TABLE),               // UINT16  HeaderLength;
+  FSPP_HEADER_REVISION_1,                // UINT8   HeaderRevision;
+  0x00,                                  // UINT8   Reserved;
+  2,                                     // UINT32  PatchEntryNum;
+  {
+    0xFFFFFFFC,                          //  Patch FVBASE at end of FV
+    0x12345678                           //  Patch module patchable PCD VpdBase
+  }
+};
+
+FSP_INFO_EXTENDED_HEADER mFspExtendedTable =
+{
+  FSP_INFO_EXTENDED_HEADER_SIGNATURE,    // UINT32  Signature  (FSPE)
+  sizeof(FSP_INFO_EXTENDED_HEADER),      // UINT32  Length;
+  FSPE_HEADER_REVISION_1,                // UINT8   Revision;
+  0x00,                                  // UINT8   Reserved;
+  {FSP_PRODUCER_ID},                     // CHAR8   FspProducerId[6];
+  0x00000001,                            // UINT32  FspProducerRevision;
+  0x00000000,                            // UINT32  FspProducerDataSize;
+};
+
 FSP_INFO_HEADER mFspInfoHeader =
 {
   FSP_INFO_HEADER_SIGNATURE,             // UINT32  Signature  (FSPH)
@@ -52,38 +76,12 @@ FSP_INFO_HEADER mFspInfoHeader =
   0x12345678,                            // UINT32  FspSiliconInitEntry;  
 };
 
-FSP_INFO_EXTENDED_HEADER mFspExtendedTable =
-{
-  FSP_INFO_EXTENDED_HEADER_SIGNATURE,    // UINT32  Signature  (FSPE)
-  sizeof(FSP_INFO_EXTENDED_HEADER),      // UINT32  Length;
-  FSPE_HEADER_REVISION_1,                // UINT8   Revision;
-  0x00,                                  // UINT8   Reserved;
-  {FSP_PRODUCER_ID},                     // CHAR8   FspProducerId[6];
-  0x00000001,                            // UINT32  FspProducerRevision;
-  0x00000000,                            // UINT32  FspProducerDataSize;
-};
-
-FSP_PATCH_TABLE mFspPatchTable =
-{
-  FSP_FSPP_SIGNATURE,                    // UINT32  Signature  (FSPP)
-  sizeof(FSP_PATCH_TABLE),               // UINT16  HeaderLength;
-  FSPP_HEADER_REVISION_1,                // UINT8   HeaderRevision;
-  0x00,                                  // UINT8   Reserved;
-  2,                                     // UINT32  PatchEntryNum;
-  {
-    0xFFFFFFFC,                          //  Patch FVBASE at end of FV
-    0x12345678                           //  Patch module patchable PCD VpdBase
-  }
-};
-
 VOID*
 ReferenceAcpiTable (
   VOID
   )
 {
-  //
-  // Reference the table being generated to prevent the optimizer from
-  // removing the data structure from the executable
-  //
-  return (VOID*)&mFspInfoHeader;
+  return (VOID*)((UINTN)&mFspPatchTable | (UINTN)&mFspExtendedTable
+                 | (UINTN)&mFspInfoHeader);
 }
+ 
