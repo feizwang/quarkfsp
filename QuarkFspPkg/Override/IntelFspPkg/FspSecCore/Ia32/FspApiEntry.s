@@ -15,11 +15,11 @@
 #
 #------------------------------------------------------------------------------
 
-
 .equ MSR_IA32_PLATFORM_ID,                   0x00000017
 .equ MSR_IA32_BIOS_UPDT_TRIG,                0x00000079
 .equ MSR_IA32_BIOS_SIGN_ID,                  0x0000008b
 
+.extern SecCarInit
 
 MicrocodeHdr:
 .equ        MicrocodeHdrVersion,                 0x0000
@@ -550,7 +550,7 @@ ASM_PFX(TempRamInitApi):
   jz        TempRamInitExit
 
   # Call Sec CAR Init
-  movl      SecCarInitDone, %eax
+  lea       SecCarInitDone, %eax
   jmp       SecCarInit
 
 SecCarInitDone:
@@ -563,9 +563,9 @@ SecCarInitDone:
   movl      %esp, %ecx
 
   #
-  # Save parameter pointer in edx  
+  # Save parameter pointer in edx
   #
-  movl      4(%esp), %edx  
+  movl      4(%esp), %edx
 
   #
   # Enable FSP STACK
@@ -573,7 +573,7 @@ SecCarInitDone:
   movl      PcdGet32 (PcdTemporaryRamBase), %esp
   addl      PcdGet32 (PcdTemporaryRamSize), %esp
 
-  pushl     DATA_LEN_OF_MCUD      # Size of the data region 
+  pushl     $DATA_LEN_OF_MCUD     # Size of the data region
   pushl     $0x4455434D           # Signature of the  data region 'MCUD'
   pushl     12(%edx)              # Code size
   pushl     8(%edx)               # Code base
@@ -583,7 +583,7 @@ SecCarInitDone:
   #
   # Save API entry/exit timestamp into stack
   #
-  pushl     DATA_LEN_OF_PER0     # Size of the data region 
+  pushl     $DATA_LEN_OF_PER0    # Size of the data region
   pushl     $0x30524550          # Signature of the  data region 'PER0'
   xorl      %edx, %edx
   pushl     %edx
@@ -595,7 +595,7 @@ SecCarInitDone:
 
   #
   # Terminator for the data on stack
-  # 
+  #
   pushl     $0
 
   #
@@ -614,6 +614,7 @@ SecCarInitDone:
   # EAX - error flag
   xorl      %eax, %eax
 
+TempRamInitExit:
   ret
 ################ Quark SoC - End ###################
 
