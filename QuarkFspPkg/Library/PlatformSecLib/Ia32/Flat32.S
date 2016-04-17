@@ -23,9 +23,16 @@
 #------------------------------------------------------------------------------
 
 #
+# Pull FSP related routines into build.
+#
+.extern TempRamInitApi:NEAR
+.extern FspInitApi:NEAR
+
+#
 # Contrary to the name, this file contains 16 bit code as well.
 #
 .text
+
 #----------------------------------------------------------------------------
 #
 # Procedure:    _ModuleEntryPoint
@@ -71,8 +78,8 @@ ASM_PFX(_ModuleEntryPoint):
 #          Others:  Failure
 #
 #-----------------------------------------------------------------------
-ASM_GLOBAL ASM_PFX(_SecCarInit)
-ASM_PFX(_SecCarInit):
+ASM_GLOBAL ASM_PFX(SecCarInit)
+ASM_PFX(SecCarInit):
 
     #
     # coreboot should initialize ESRAM before TempRamInit API,
@@ -81,3 +88,9 @@ ASM_PFX(_SecCarInit):
     movl    %eax, %ebp
     xorl    %eax, %eax
     jmp     %ebp
+
+    #
+    # Reference the routines to get the linker to pull them in
+    #
+    jmp     TempRamInitApi
+    jmp     FspInitApi
