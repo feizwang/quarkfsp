@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_5e72ad4a",
+        "filename": "QuarkFspPkg/Override/IntelFspPkg/FspSecCore/Ia32/FspApiEntry.s",
+        "patchSetId": 2
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-18T15:20:04Z",
+      "side": 1,
+      "message": "The original code use this,\n  jmp     ASM_PFX(SecCarInit)",
+      "revId": "965d584915a076503ff7923a7c671e6f60eaae5d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
