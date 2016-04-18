@@ -103,9 +103,9 @@ SecCarInit PROC NEAR PUBLIC
   ; coreboot should initialize ESRAM before TempRamInit API,
   ; do nothing here.
   ;
-  mov	ebp, eax
+  mov	edx, eax
   xor   eax, eax	
-  jmp  ebp
+  jmp  edx
 SecCarInit ENDP
 
 END

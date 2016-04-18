@@ -365,9 +365,9 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   jnz       TempRamInitExit
 
   ;
-  ; Save return address to EBP
+  ; Save return address to ecx
   ;
-  mov ebp, esp
+  mov ebp, ecx
 
   ;
   ; Save parameter pointer in edx  
@@ -406,21 +406,17 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   push      0
 
   ;
+  ; Restore return address to ecx
+  ;
+  mov esp, ecx
+
+  ;
   ; Set ECX/EDX to the bootloader temporary memory range
   ;
   mov       ecx, PcdGet32 (PcdTemporaryRamBase)
   mov       edx, ecx
   add       edx, PcdGet32 (PcdTemporaryRamSize)
   sub       edx, PcdGet32 (PcdFspTemporaryRamSize)
-
-  ;
-  ; Restore return address to EBP
-  ;
-  mov esp, ebp
-
-  ; EBP - FSP_INFO_HEADER pointer
-  mov       ebp, PcdGet32 (PcdFspAreaBaseAddress)
-  add       ebp, 0x94 ; TODO - Fixed it to 0x94
 
   ; EAX - error flag
   xor       eax, eax
