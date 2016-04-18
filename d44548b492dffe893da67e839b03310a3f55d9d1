@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_3ed12958",
+        "filename": "QuarkFspPkg/FspHeader/FspHeader.aslc",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-18T14:25:27Z",
+      "side": 1,
+      "message": "I dont understand how this work, it looks like we just pull the tables into build instead of return a valid address, am I right?",
+      "revId": "d44548b492dffe893da67e839b03310a3f55d9d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
