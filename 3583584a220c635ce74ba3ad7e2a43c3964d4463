@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_fecaa1a0",
+        "filename": "QuarkFspPkg/Readme.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-18T14:31:07Z",
+      "side": 1,
+      "message": "Correct this line: set Workspace to a new line.",
+      "revId": "3583584a220c635ce74ba3ad7e2a43c3964d4463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_9e47151d",
+        "filename": "QuarkFspPkg/Readme.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-18T14:31:07Z",
+      "side": 1,
+      "message": "Can the keyword \"set\" \u0026 \"%CD\" works in Linux?\n\nNot something like this,\n\nexport WORKSPACE\u003d$PWD\nexport PACKAGES_PATH\u003d$WORKSPACE/edk2:$WORKSPACE/edk2-non-osi\nexport EDK_TOOLS_PATH\u003d$WORKSPACE/edk2/BaseTools",
+      "revId": "3583584a220c635ce74ba3ad7e2a43c3964d4463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_decd9db8",
+        "filename": "QuarkFspPkg/Readme.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1008116
+      },
+      "writtenOn": "2016-04-18T14:31:07Z",
+      "side": 1,
+      "message": "I would prefer to call the build script to buildfsp.sh, similar as what the windows one - buildfsp.bat.",
+      "revId": "3583584a220c635ce74ba3ad7e2a43c3964d4463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
