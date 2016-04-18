@@ -17,7 +17,6 @@ Agreement 1.0"
 
 Work List:
 
-* Get things to build with Linux
 * Move BIOS code from Platform/Pei/PlatformInit/BiosCode* into coreboot and
 TianoCore
 * Reduce to minimal FSP
