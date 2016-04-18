@@ -558,9 +558,9 @@ SecCarInitDone:
   jnz       TempRamInitExit
 
   #
-  # Save return address to EBP
+  # Save return address to ecx
   #
-  movl      %esp, %ebp
+  movl      %esp, %ecx
 
   #
   # Save parameter pointer in edx
@@ -599,21 +599,17 @@ SecCarInitDone:
   pushl     $0
 
   #
+  # Restore return address to esp
+  #
+  movl      %ecx, %esp
+
+  #
   # Set ECX/EDX to the bootloader temporary memory range
   #
   movl      PcdGet32 (PcdTemporaryRamBase), %ecx
   movl      %ecx, %edx
   addl      PcdGet32 (PcdTemporaryRamSize), %edx
   subl      PcdGet32 (PcdFspTemporaryRamSize), %edx
-
-  #
-  # Restore return address to EBP
-  #
-  movl      %ebp, %esp
-
-  # EBP - FSP_INFO_HEADER pointer
-  movl      PcdGet32 (PcdFspAreaBaseAddress), %ebp
-  addl      $0x94, %ebp          # TODO - Fixed it to 0x94
 
   # EAX - error flag
   xorl      %eax, %eax

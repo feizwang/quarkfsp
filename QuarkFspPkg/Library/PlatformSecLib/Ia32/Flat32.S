@@ -85,9 +85,9 @@ ASM_PFX(SecCarInit):
     # coreboot should initialize ESRAM before TempRamInit API,
     # do nothing here.
     #
-    movl    %eax, %ebp
+    movl    %eax, %edx
     xorl    %eax, %eax
-    jmp     %ebp
+    jmp     %edx
 
     #
     # Reference the routines to get the linker to pull them in
