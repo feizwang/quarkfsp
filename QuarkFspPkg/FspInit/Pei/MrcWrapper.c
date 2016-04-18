@@ -554,11 +554,6 @@ InstallEfiMemory (
   EFI_RESOURCE_ATTRIBUTE_TYPE           Attribute;
   EFI_PHYSICAL_ADDRESS                  BadMemoryAddress;
   EFI_SMRAM_DESCRIPTOR                  DescriptorAcpiVariable;
-  //VOID                                  *CapsuleBuffer;
-  //UINTN                                 CapsuleBufferLength;
-  //PEI_CAPSULE_PPI                       *Capsule;
-  VOID                                  *LargeMemRangeBuf;
-  UINTN                                 LargeMemRangeBufLen;
   UINT8                                 MorControl;
   UINTN                                 DataSize;
 
@@ -669,72 +664,6 @@ InstallEfiMemory (
       PeiMemoryIndex = Index;
     }
   }
-
-  //
-  // Find the largest memory range excluding that given to PEI.
-  //
-  LargeMemRangeBuf = NULL;
-  LargeMemRangeBufLen = 0;
-  for (Index = 0; Index < NumRanges; Index++) {
-    if ((MemoryMap[Index].Type == DualChannelDdrMainMemory) &&
-        (MemoryMap[Index].PhysicalAddress + MemoryMap[Index].RangeLength < MAX_ADDRESS)) {
-          if (Index != PeiMemoryIndex) {
-            if (MemoryMap[Index].RangeLength > LargeMemRangeBufLen) {
-              LargeMemRangeBuf = (VOID *) ((UINTN) MemoryMap[Index].PhysicalAddress);
-              LargeMemRangeBufLen = (UINTN) MemoryMap[Index].RangeLength;
-            }
-          } else {
-            if ((MemoryMap[Index].RangeLength - PeiMemoryLength) >= LargeMemRangeBufLen) {
-              LargeMemRangeBuf = (VOID *) ((UINTN) MemoryMap[Index].PhysicalAddress);
-              LargeMemRangeBufLen = (UINTN) (MemoryMap[Index].RangeLength - PeiMemoryLength);
-            }
-          }
-    }
-  }
-
-  //Capsule             = NULL;
-  //CapsuleBuffer       = NULL;
-  //CapsuleBufferLength = 0;
-  //if (BootMode == BOOT_ON_FLASH_UPDATE) {
-  //  Status = PeiServicesLocatePpi (
-  //             &gPeiCapsulePpiGuid,  // GUID
-  //             0,                    // INSTANCE
-  //             NULL,                 // EFI_PEI_PPI_DESCRIPTOR
-  //             (VOID **)&Capsule     // PPI
-  //             );
-  //  ASSERT_EFI_ERROR (Status);
-
-  //  if (Status == EFI_SUCCESS) {
-  //    CapsuleBuffer = LargeMemRangeBuf;
-  //    CapsuleBufferLength = LargeMemRangeBufLen;
-
-  //    //
-  //    // Call the Capsule PPI Coalesce function to coalesce the capsule data.
-  //    //
-  //    Status = Capsule->Coalesce (
-  //                        PeiServices,
-  //                        &CapsuleBuffer,
-  //                        &CapsuleBufferLength
-  //                        );
-  //    //
-  //    // If it failed, then NULL out our capsule PPI pointer so that the capsule
-  //    // HOB does not get created below.
-  //    //
-  //    if (Status != EFI_SUCCESS) {
-  //      Capsule = NULL;
-  //    }
-  //  }
-  //}
-
-  //
-  // Set up the IMR policy required for this platform
-  //
-  //Status = SetPlatformImrPolicy (
-  //            PeiMemoryBaseAddress,
-  //            PeiMemoryLength,
-  //            RequiredMemSize
-  //            );
-  //ASSERT_EFI_ERROR (Status);
 
   //
   // Carve out the top memory reserved for ACPI
@@ -1085,7 +1014,6 @@ RetriveRequiredMemorySize (
   OUT     UINTN                             *Size
   )
 {
-  EFI_STATUS                     Status;
   EFI_PEI_HOB_POINTERS           Hob;
   EFI_MEMORY_TYPE_INFORMATION    *MemoryData;
   UINT8                          Index;
@@ -1095,7 +1023,7 @@ RetriveRequiredMemorySize (
   TempPageNum = 0;
   Index       = 0;
 
-  Status      = PeiServicesGetHobList ((VOID **)&Hob.Raw);
+  PeiServicesGetHobList ((VOID **)&Hob.Raw);
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION &&
         CompareGuid (&Hob.Guid->Name, &gEfiMemoryTypeInformationGuid)
@@ -1167,7 +1095,6 @@ GetMemoryMap (
   PEI_MEMORY_RANGE_SMRAM            SmramMask;
   PEI_MEMORY_RANGE_SMRAM            TsegMask;
   UINT32                            BlockNum;
-  UINT8                             EsmramcRegister;
   UINT8                             ExtendedMemoryIndex;
   UINT32                            Register;
 
@@ -1190,7 +1117,6 @@ GetMemoryMap (
   //
   // Generate Memory ranges for the memory map.
   //
-  EsmramcRegister = 0;
   MemorySize = 0;
 
   RowLength = TotalMemorySize;
@@ -1472,135 +1398,6 @@ BaseMemoryTest (
 Done:
   return EFI_SUCCESS;
 }
-
-/**
-
-  This function sets up the platform specific IMR protection for the various
-  memory regions.
-
-  @param  PeiMemoryBaseAddress  Base address of memory allocated for PEI.
-  @param  PeiMemoryLength       Length in bytes of the PEI memory (includes ACPI memory).
-  @param  RequiredMemSize       Size in bytes of the ACPI/Runtime memory
-
-  @return EFI_SUCCESS           The function completed successfully.
-          EFI_ACCESS_DENIED     Access to IMRs failed.
-
-**/
-//EFI_STATUS
-//SetPlatformImrPolicy (
-//  IN      EFI_PHYSICAL_ADDRESS    PeiMemoryBaseAddress,
-//  IN      UINT64                  PeiMemoryLength,
-//  IN      UINTN                   RequiredMemSize
-//  )
-//{
-//  UINT8         Index;
-//  UINT32        Register;
-//  UINT16        DeviceId;
-//
-//  //
-//  // Check what Soc we are running on (read Host bridge DeviceId)
-//  //
-//  DeviceId = QNCMmPci16(0, MC_BUS, MC_DEV, MC_FUN, PCI_DEVICE_ID_OFFSET);
-//
-//  //
-//  // If any IMR register is locked then we cannot proceed
-//  //
-//  for (Index = (QUARK_NC_MEMORY_MANAGER_IMR0+QUARK_NC_MEMORY_MANAGER_IMRXL); Index <=(QUARK_NC_MEMORY_MANAGER_IMR7+QUARK_NC_MEMORY_MANAGER_IMRXL); Index=Index+4)
-//  {
-//    Register = QNCPortRead (QUARK_NC_MEMORY_MANAGER_SB_PORT_ID, Index);
-//    if (Register & IMR_LOCK) {
-//      return EFI_ACCESS_DENIED;
-//    }
-//  }
-//
-//  //
-//  // Add IMR0 protection for the 'PeiMemory'
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR0,
-//            (UINT32)(((RShiftU64(PeiMemoryBaseAddress, 8)) & IMRL_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-RequiredMemSize + EFI_PAGES_TO_SIZE(EDKII_DXE_MEM_SIZE_PAGES-1) - 1), 8)) & IMRL_MASK),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Add IMR2 protection for shadowed RMU binary.
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR2,
-//            (UINT32)(((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength), 8)) & IMRH_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength+PcdGet32(PcdFlashQNCMicrocodeSize)-1), 8)) & IMRH_MASK),
-//            (UINT32)(CPU_SNOOP + RMU + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + RMU + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Add IMR3 protection for the default SMRAM.
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR3,
-//            (UINT32)(((RShiftU64((SMM_DEFAULT_SMBASE), 8)) & IMRL_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64((SMM_DEFAULT_SMBASE+SMM_DEFAULT_SMBASE_SIZE_BYTES-1), 8)) & IMRH_MASK),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Add IMR5 protection for the legacy S3 and AP Startup Vector region (below 1MB).
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR5,
-//            (UINT32)(((RShiftU64(AP_STARTUP_VECTOR, 8)) & IMRL_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64((AP_STARTUP_VECTOR + EFI_PAGE_SIZE - 1), 8)) & IMRH_MASK),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Add IMR6 protection for the ACPI Reclaim/ACPI/Runtime Services.
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR6,
-//            (UINT32)(((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-RequiredMemSize+EFI_PAGES_TO_SIZE(EDKII_DXE_MEM_SIZE_PAGES-1)), 8)) & IMRL_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-EFI_PAGE_SIZE-1), 8)) & IMRH_MASK),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Enable IMR4 protection of eSRAM.
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR4,
-//            (UINT32)(((RShiftU64((UINTN)PcdGet32 (PcdEsramStage1Base), 8)) & IMRL_MASK) | IMR_EN),
-//            (UINT32)((RShiftU64(((UINTN)PcdGet32 (PcdEsramStage1Base) + (UINTN)PcdGet32 (PcdESramMemorySize) - 1), 8)) & IMRH_MASK),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-//            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-//        );
-//
-//  //
-//  // Enable Interrupt on IMR/SMM Violation
-//  //
-//  QNCPortWrite (QUARK_NC_MEMORY_MANAGER_SB_PORT_ID, QUARK_NC_MEMORY_MANAGER_BIMRVCTL, (UINT32)(EnableIMRInt));
-//  if (DeviceId == QUARK2_MC_DEVICE_ID) {
-//    QNCPortWrite (QUARK_NC_MEMORY_MANAGER_SB_PORT_ID, QUARK_NC_MEMORY_MANAGER_BSMMVCTL, (UINT32)(EnableSMMInt));
-//  }
-//
-//  //
-//  // Disable IMR7 memory protection (eSRAM + DDR3 memory) since our policies
-//  // are now setup.
-//  //
-//  QncImrWrite (
-//            QUARK_NC_MEMORY_MANAGER_IMR7,
-//            (UINT32)(IMRL_RESET & ~IMR_EN),
-//            (UINT32)IMRH_RESET,
-//            (UINT32)IMRX_ALL_ACCESS,
-//            (UINT32)IMRX_ALL_ACCESS
-//        );
-//
-//  return EFI_SUCCESS;
-//}
 
 /** Return info derived from Installing Memory by MemoryInit.
 
