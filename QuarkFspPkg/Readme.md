@@ -2,6 +2,34 @@
 
 ## **Features**
 
+## **Linux Build Instructions**
+
+### Get the Source
+
+```
+git clone https://github.com/tianocore/edk2.git
+git clone https://github.com/tianocore/edk2-BaseTools-win32.git
+git clone https://github.com/tianocore/edk2-non-osi.git
+```
+1. Go to https://review.gerrithub.io/#/admin/projects/feizwang/quarkfsp
+2. Click on "Clone with commit-msg hook" tab
+3. Click on ssh tab
+4. Copy the git clone string
+5. ln -s quarkfsp/QuarkFspPkg edk2/QuarkFspPkg
+
+### Setup the build environment
+
+```set WORKSPACE=%CD%
+set PACKAGES_PATH=%WORKSPACE%\edk2;%WORKSPACE%\edk2-non-osi
+set EDK_TOOLS_BIN=%WORKSPACE%\edk2-BaseTools-win32
+```
+
+### Build FSP
+
+```
+QuarkFspPkg/quarkfsp.sh -d32
+```
+
 ## **Windows Build Instructions**
 
 ### Pre-requisites
