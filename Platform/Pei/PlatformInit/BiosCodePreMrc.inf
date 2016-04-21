@@ -63,17 +63,8 @@
 #
 
 [Sources]
-#  Generic/Recovery.c
-#  PlatformErratas.c
-#  MrcWrapper.c
-#  MrcWrapper.h
   BiosCodePreMrc.c
-  PlatformEarlyInit.h
-#  MemoryCallback.c
-#  BootMode.c
   CommonHeader.h
-#  PeiFvSecurity.c
-#  PeiFvSecurity.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -89,7 +80,6 @@
   ResetSystemLib
   PrintLib
   TimerLib
-#  RecoveryOemHookLib
   PcdLib
   IntelQNCLib
   ReportStatusCodeLib

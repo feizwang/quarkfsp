@@ -20,7 +20,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include "CommonHeader.h"
-#include "PlatformEarlyInit.h"
+
+//
+// USB Phy Registers
+//
+#define USB2_GLOBAL_PORT  0x4001
+#define USB2_PLL1         0x7F02
+#define USB2_PLL2         0x7F03
+#define USB2_COMPBG       0x7F04
 
 //
 // The global indicator, the FvFileLoader callback will modify it to TRUE after loading PEIM into memory
@@ -136,71 +143,6 @@ SetLanControllerMacAddr (
 }
 
 /**
-  This is the entrypoint of PEIM
-
-  @param  FileHandle  Handle of the file being invoked.
-  @param  PeiServices Describes the list of possible PEI Services.
-
-  @retval EFI_SUCCESS if it completed successfully.
-**/
-EFI_STATUS
-EFIAPI
-BiosBeforeMemoryInit(
-  IN       EFI_PEI_FILE_HANDLE  FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
-  )
-{
-  EFI_STATUS                              Status = EFI_SUCCESS;
-  EFI_BOOT_MODE                           BootMode;
-
-  //
-  // Workaround:
-  //   This driver will be invoked before MemoryInitUpd pointer initailized.
-  //   To avoid the system halt, just initialized it before MemoryInitUpd used.
-  //
-  // Background:
-  //   According to current architect, pointer of UPD data region is equal to
-  //   pointer of Memory Init UPD data region.
-  //
-  // Note:
-  //   Since the whole BiosCodePreMrc and BiosCodePostMrc PEIM will be
-  //   removed in the future, so it's not a problem.
-  //
-  UPD_DATA_REGION *UpdDataRgnPtr = (UPD_DATA_REGION *)GetFspUpdDataPointer();
-  MEMORY_INIT_UPD *MemoryInitUpdPtr = (MEMORY_INIT_UPD *)UpdDataRgnPtr;
-  SetFspMemoryInitUpdDataPointer(MemoryInitUpdPtr);
-  SetFspSiliconInitUpdDataPointer((void *)NULL);
-
-  //PlatformType = (EFI_PLATFORM_TYPE)PcdGet16 (PcdPlatformType);
-  MemoryInitUpdPtr = (MEMORY_INIT_UPD *)GetFspMemoryInitUpdDataPointer();
-
-  //
-  // Do any early platform specific initialization.
-  //
-  EarlyPlatformInit ();
-
-  // Program USB Phy
-  InitializeUSBPhy();
-
-  //
-  // Do platform specific logic to create a boot mode
-  //
-  Status = PeiServicesGetBootMode(&BootMode);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Signal possible dependent modules that there has been a
-  // final boot mode determination
-  //
-
-  if (BootMode != BOOT_ON_S3_RESUME) {
-    QNCClearSmiAndWake ();
-  }
-
-  return Status;
-}
-
-/**
   This function will initialize USB Phy registers associated with QuarkSouthCluster.
 
   @param  VOID                  No Argument
@@ -301,57 +243,6 @@ EarlyPlatformThermalSensorInit (
   // Lock all RMU Thermal sensor control & trip point registers.
   //
   QNCThermalSensorLockAllRegisters ();
-}
-
-/**
-  This function provides early platform initialization.
-
-  @param  PlatformInfo  Pointer to platform Info structure.
-
-**/
-VOID
-EFIAPI
-EarlyPlatformInit (
-  VOID
-  )
-{
-  EFI_PLATFORM_TYPE                 PlatformType;
-
-  //PlatformType = (EFI_PLATFORM_TYPE) PcdGet16 (PcdPlatformType);
-  MEMORY_INIT_UPD  *MemoryInitUpdPtr = (MEMORY_INIT_UPD *)GetFspMemoryInitUpdDataPointer();
-  PlatformType = MemoryInitUpdPtr->PcdPlatformType;
-
-  DEBUG ((EFI_D_INFO, "EarlyPlatformInit for PlatType=0x%02x\n", (UINTN) PlatformType));
-
-  //
-  // Early Legacy Gpio Init.
-  //
-  EarlyPlatformLegacyGpioInit (PlatformType);
-
-  //
-  // Early platform Legacy GPIO manipulation depending on GPIOs
-  // setup by EarlyPlatformLegacyGpioInit.
-  //
-  EarlyPlatformLegacyGpioManipulation (PlatformType);
-
-  //
-  // Early platform specific GPIO Controller init & manipulation.
-  // Combined for sharing of temp. memory bar.
-  //
-  EarlyPlatformGpioCtrlerInitAndManipulation (PlatformType);
-
-  //
-  // Early Thermal Sensor Init.
-  //
-  EarlyPlatformThermalSensorInit ();
-
-  //
-  // Early Lan Ethernet Mac Init.
-  //
-  EarlyPlatformMacInit (
-    PcdGetPtr (PcdIohEthernetMac0),
-    PcdGetPtr (PcdIohEthernetMac1)
-    );
 }
 
 /**
@@ -692,4 +583,120 @@ EarlyPlatformMacInit (
       (UINTN) IOH_MAC1_FUNCTION_NUMBER
       ));
   }
+}
+
+/**
+  This function provides early platform initialization.
+
+  @param  PlatformInfo  Pointer to platform Info structure.
+
+**/
+VOID
+EFIAPI
+EarlyPlatformInit (
+  VOID
+  )
+{
+  EFI_PLATFORM_TYPE                 PlatformType;
+
+  //PlatformType = (EFI_PLATFORM_TYPE) PcdGet16 (PcdPlatformType);
+  MEMORY_INIT_UPD  *MemoryInitUpdPtr = (MEMORY_INIT_UPD *)GetFspMemoryInitUpdDataPointer();
+  PlatformType = MemoryInitUpdPtr->PcdPlatformType;
+
+  DEBUG ((EFI_D_INFO, "EarlyPlatformInit for PlatType=0x%02x\n", (UINTN) PlatformType));
+
+  //
+  // Early Legacy Gpio Init.
+  //
+  EarlyPlatformLegacyGpioInit (PlatformType);
+
+  //
+  // Early platform Legacy GPIO manipulation depending on GPIOs
+  // setup by EarlyPlatformLegacyGpioInit.
+  //
+  EarlyPlatformLegacyGpioManipulation (PlatformType);
+
+  //
+  // Early platform specific GPIO Controller init & manipulation.
+  // Combined for sharing of temp. memory bar.
+  //
+  EarlyPlatformGpioCtrlerInitAndManipulation (PlatformType);
+
+  //
+  // Early Thermal Sensor Init.
+  //
+  EarlyPlatformThermalSensorInit ();
+
+  //
+  // Early Lan Ethernet Mac Init.
+  //
+  EarlyPlatformMacInit (
+    PcdGetPtr (PcdIohEthernetMac0),
+    PcdGetPtr (PcdIohEthernetMac1)
+    );
+}
+
+/**
+  This is the entrypoint of PEIM
+
+  @param  FileHandle  Handle of the file being invoked.
+  @param  PeiServices Describes the list of possible PEI Services.
+
+  @retval EFI_SUCCESS if it completed successfully.
+**/
+EFI_STATUS
+EFIAPI
+BiosBeforeMemoryInit(
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
+  )
+{
+  EFI_STATUS                              Status = EFI_SUCCESS;
+  EFI_BOOT_MODE                           BootMode;
+
+  //
+  // Workaround:
+  //   This driver will be invoked before MemoryInitUpd pointer initailized.
+  //   To avoid the system halt, just initialized it before MemoryInitUpd used.
+  //
+  // Background:
+  //   According to current architect, pointer of UPD data region is equal to
+  //   pointer of Memory Init UPD data region.
+  //
+  // Note:
+  //   Since the whole BiosCodePreMrc and BiosCodePostMrc PEIM will be
+  //   removed in the future, so it's not a problem.
+  //
+  UPD_DATA_REGION *UpdDataRgnPtr = (UPD_DATA_REGION *)GetFspUpdDataPointer();
+  MEMORY_INIT_UPD *MemoryInitUpdPtr = (MEMORY_INIT_UPD *)UpdDataRgnPtr;
+  SetFspMemoryInitUpdDataPointer(MemoryInitUpdPtr);
+  SetFspSiliconInitUpdDataPointer((void *)NULL);
+
+  //PlatformType = (EFI_PLATFORM_TYPE)PcdGet16 (PcdPlatformType);
+  MemoryInitUpdPtr = (MEMORY_INIT_UPD *)GetFspMemoryInitUpdDataPointer();
+
+  //
+  // Do any early platform specific initialization.
+  //
+  EarlyPlatformInit ();
+
+  // Program USB Phy
+  InitializeUSBPhy();
+
+  //
+  // Do platform specific logic to create a boot mode
+  //
+  Status = PeiServicesGetBootMode(&BootMode);
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Signal possible dependent modules that there has been a
+  // final boot mode determination
+  //
+
+  if (BootMode != BOOT_ON_S3_RESUME) {
+    QNCClearSmiAndWake ();
+  }
+
+  return Status;
 }
