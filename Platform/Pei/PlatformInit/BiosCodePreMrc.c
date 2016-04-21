@@ -179,18 +179,12 @@ BiosBeforeMemoryInit(
   //
   EarlyPlatformInit ();
 
-  //
-  // Initialize System Phys
-  //
-
   // Program USB Phy
   InitializeUSBPhy();
 
   //
   // Do platform specific logic to create a boot mode
   //
-  //Status = UpdateBootMode ((EFI_PEI_SERVICES**)PeiServices, &BootMode);
-  //ASSERT_EFI_ERROR (Status);
   Status = PeiServicesGetBootMode(&BootMode);
   ASSERT_EFI_ERROR(Status);
 
