@@ -22,33 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "CommonHeader.h"
 
 /**
-  This function provides early platform Thermal sensor initialisation.
-**/
-VOID
-EFIAPI
-EarlyPlatformThermalSensorInit (
-  VOID
-  )
-{
-  DEBUG ((EFI_D_INFO, "Early Platform Thermal Sensor Init\n"));
-
-  //
-  // Set Thermal sensor mode.
-  //
-  QNCThermalSensorSetRatiometricMode ();
-
-  //
-  // Enable RMU Thermal sensor with a Catastrophic Trip point.
-  //
-  QNCThermalSensorEnableWithCatastrophicTrip (PLATFORM_CATASTROPHIC_TRIP_CELSIUS);
-
-  //
-  // Lock all RMU Thermal sensor control & trip point registers.
-  //
-  QNCThermalSensorLockAllRegisters ();
-}
-
-/**
   This is the entrypoint of PEIM
 
   @param  FileHandle  Handle of the file being invoked.
@@ -65,11 +38,6 @@ BiosBeforeMemoryInit(
 {
   EFI_STATUS Status;
   EFI_BOOT_MODE BootMode;
-
-  //
-  // Early Thermal Sensor Init.
-  //
-  EarlyPlatformThermalSensorInit ();
 
   //
   // Do platform specific logic to create a boot mode
