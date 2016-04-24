@@ -21,14 +21,14 @@
 ################################################################################
 [Defines]
 DEFINE FLASH_BASE       = 0x80000000     #The base address of the FSP
-DEFINE FLASH_SIZE       = 0x00050000     #The flash size in bytes of the FSP
+DEFINE FLASH_SIZE       = 0x00040000     #The flash size in bytes of the FSP
 DEFINE FLASH_BLOCK_SIZE = 0x00001000     #The block size
-DEFINE FLASH_NUM_BLOCKS = 0x50           #The number of blocks
+DEFINE FLASH_NUM_BLOCKS = 0x40           #The number of blocks
 
 DEFINE FLASH_FSP_FV2_OFFSET  = 0x00000000
 DEFINE FLASH_FSP_FV2_SIZE    = 0x00008000
 DEFINE FLASH_FSP_FV1_OFFSET   = 0x00008000
-DEFINE FLASH_FSP_FV1_SIZE     = 0x00048000
+DEFINE FLASH_FSP_FV1_SIZE     = 0x00038000
 
 ################################################################################
 #
