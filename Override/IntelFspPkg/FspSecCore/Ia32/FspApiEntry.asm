@@ -367,7 +367,7 @@ TempRamInitApi   PROC    NEAR    PUBLIC
   ;
   ; Save return address to ecx
   ;
-  mov ebp, ecx
+  mov ecx, esp
 
   ;
   ; Save parameter pointer in edx  
