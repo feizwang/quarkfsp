@@ -87,7 +87,6 @@
   FspSwitchStackLib
   ResetSystemLib
   IntelQNCLib
-  PlatformHelperLib
   ReportStatusCodeLib
 
 [Depex]

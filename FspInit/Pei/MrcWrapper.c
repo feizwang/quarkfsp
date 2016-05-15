@@ -226,7 +226,16 @@ PostInstallMemory (
   if (IsS3) {
     QNCSendOpcodeDramReady (RmuMainDestBaseAddress);
   } else {
-    Status = PlatformFindFvFileRawDataSection (NULL, PcdGetPtr(PcdQuarkMicrocodeFile), (VOID **) &RmuMainSrcBaseAddress, &RmuMainSize);
+    MEMORY_INIT_UPD  *MemoryInitUpdPtr = (MEMORY_INIT_UPD *)GetFspMemoryInitUpdDataPointer();
+
+    RmuMainSrcBaseAddress = (UINT32 *) MemoryInitUpdPtr->PcdRmuBinaryBaseAddress;
+    RmuMainSize = (UINT32) MemoryInitUpdPtr->PcdRmuBinaryLen;
+
+    Status = EFI_SUCCESS;
+    if (RmuMainSrcBaseAddress == NULL || RmuMainSize == 0) {
+      Status = EFI_INVALID_PARAMETER;
+    }
+
     ASSERT_EFI_ERROR (Status);
     if (!EFI_ERROR (Status)) {
       DEBUG ((EFI_D_INFO, "Found Microcode ADDR:SIZE 0x%08x:0x%04x\n", (UINTN) RmuMainSrcBaseAddress, RmuMainSize));

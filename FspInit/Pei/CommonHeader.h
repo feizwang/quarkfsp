@@ -68,4 +68,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Register/Cpuid.h>
 
+#include <FspUpdVpd.h>
+#include <Library/FspCommonLib.h>
+
 #endif

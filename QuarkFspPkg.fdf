@@ -109,13 +109,6 @@ FILE RAW = 06A70056-3D0F-4A94-A743-5491CC9391D3 {
 }
 !endif
 
-  ##
-  #  PEI Phase RAW Data files.
-  ##
-FILE FREEFORM = PCD(gEfiQuarkNcSocIdTokenSpaceGuid.PcdQuarkMicrocodeFile) {
-  SECTION RAW = QuarkSocBinPkg/QuarkNorthCluster/Binary/QuarkMicrocode/RMU.bin
-  }
-
 #
 # It is important to keep the proper order for these PEIMs
 # for this implementation

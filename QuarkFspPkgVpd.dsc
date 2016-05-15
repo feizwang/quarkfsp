@@ -66,7 +66,7 @@
   gQuarkFspTokenSpaceGuid.Signature                  | 0x0020 | 0x08 | 0x244450554D454D24
   gQuarkFspTokenSpaceGuid.Revision                   | 0x0028 | 0x08 | 0x00
 
-  gQuarkFspTokenSpaceGuid.PcdRmuBinaryBaseAddress    | 0x0030 | 0x04 | 0xFFF10000
+  gQuarkFspTokenSpaceGuid.PcdRmuBinaryBaseAddress    | 0x0030 | 0x04 | 0xFFF00000
   gQuarkFspTokenSpaceGuid.PcdRmuBinaryLen            |0x0034| 0x04 | 0x02000
   gQuarkFspTokenSpaceGuid.PcdSmmTsegSize            |0x0038| 0x01 | 0x02
   
