@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/SmBus.h>
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/SmBios.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Ppi/AtaController.h>

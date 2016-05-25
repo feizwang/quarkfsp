@@ -404,6 +404,8 @@ MemoryInit (
   // Mark MRC completed
   IoAnd32 (PmswAdr, ~(UINT32)B_QNC_GPE0BLK_PMSW_DRAM_INIT);
 
+  // Create SMBIOS Memory Info HOB
+  BuildFspSmbiosMemoryInfoHob(&MrcData);
 
   //
   // Note emulation platform has to read actual memory size
@@ -1479,4 +1481,100 @@ InfoPostInstallMemory (
   if (RmuMainBaseAddressPtr != NULL) {
     *RmuMainBaseAddressPtr = (UINT32) CalcLength;
   }
+}
+
+/**
+  Build FSP SMBIOS memory info HOB
+
+  @param[in] MrcData          Pointer to Mrc Parameters
+**/
+VOID
+BuildFspSmbiosMemoryInfoHob (
+  IN     MRCParams_t         *MrcData
+  )
+{
+  FSP_SMBIOS_MEMORY_INFO      FspSmbiosMemoryInfo;
+  UINT8                       ChannelIndex;
+  UINT8                       ChannelCount;
+  UINT8                       DimmIndex;
+  UINT8                       DimmCount;
+
+  FspSmbiosMemoryInfo.Revision = 0x01;
+  
+  //
+  // Initialize Memory Type entry
+  //
+  switch (MrcData->ddr_type) {
+  case DDR3:
+    FspSmbiosMemoryInfo.MemoryType = MemoryTypeDdr3;
+    break;
+  case DDR3L:
+    FspSmbiosMemoryInfo.MemoryType = MemoryTypeLpddr3;
+    break;
+  default:
+    FspSmbiosMemoryInfo.MemoryType = MemoryTypeUnknown;
+    break;
+  }
+
+  //
+  // Initialize Memory Speed entry
+  //
+  switch (MrcData->ddr_speed) {
+  case DDRFREQ_800:
+    FspSmbiosMemoryInfo.MemoryFrequencyInMHz = 800;
+    break;
+  case DDRFREQ_1066:
+    FspSmbiosMemoryInfo.MemoryFrequencyInMHz = 1066;
+    break;
+  default:
+    FspSmbiosMemoryInfo.MemoryFrequencyInMHz = 0;
+    break;
+  }
+
+  //
+  // Get the Memory DataWidth info
+  //
+  switch (MrcData->dram_width) {
+  case x8:
+    FspSmbiosMemoryInfo.DataWidth = 8;
+    break;
+  case x16:
+    FspSmbiosMemoryInfo.DataWidth = 16;
+    break;
+  case x32:
+    FspSmbiosMemoryInfo.DataWidth = 32;
+    break;
+  default:
+    FspSmbiosMemoryInfo.DataWidth = 0;
+    break;
+  }
+
+  if (MrcData->ecc_enables) {
+    FspSmbiosMemoryInfo.ErrorCorrectionType = MemoryErrorCorrectionSingleBitEcc;
+  } else {
+    FspSmbiosMemoryInfo.ErrorCorrectionType = MemoryErrorCorrectionNone;
+  }
+
+  ChannelCount = 0;
+  for (ChannelIndex = 0; ChannelIndex < NUM_CHANNELS; ChannelIndex++) {
+    DimmCount = 0;
+    FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].ChannelId = ChannelIndex;
+    for (DimmIndex = 0; DimmIndex < MAX_SOCKETS; DimmIndex++) {
+      FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmInfo[DimmIndex].DimmId = DimmIndex;
+      FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmInfo[DimmIndex].SizeInMb = (MrcData->mem_size >> 20);
+      DimmCount++;
+    }
+    FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmCount = DimmCount;
+    ChannelCount++;
+  }
+  FspSmbiosMemoryInfo.ChannelCount = ChannelCount;
+
+  //
+  // Build HOB for FspSmbiosMemoryInfo
+  //
+  BuildGuidDataHob (
+    &gFspSmbiosMemoryInfoHobGuid,
+    &FspSmbiosMemoryInfo,
+    sizeof (FSP_SMBIOS_MEMORY_INFO)
+    );
 }

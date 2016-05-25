@@ -236,4 +236,14 @@ InfoPostInstallMemory (
   OUT     UINTN                   *NumSmramRegionsPtr OPTIONAL
   );
 
+/**
+Build FSP SMBIOS memory info HOB
+
+@param[in] MrcData          Pointer to Mrc Parameters
+**/
+VOID
+BuildFspSmbiosMemoryInfoHob(
+  IN     MRCParams_t            *MrcData
+);
+
 #endif

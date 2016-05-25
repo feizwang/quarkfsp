@@ -44,14 +44,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <FspApi.h>
 #include <FspUpdVpd.h>
 #include <Register/Cpuid.h>
-#include <Include/IndustryStandard/SmBios.h>
-#include <mrc.h>
 
 #define PEI_STALL_RESOLUTION            1
-
-#define DDRFREQ_UNKNOWN                 0
-#define DDRFREQ_800MHZ                  800
-#define DDRFREQ_1066MHZ                 1066
 
 /**
 This function reset the entire platform, including all processor and devices, and

@@ -311,58 +311,6 @@ ReportAndInstallNewFv (
 }
 
 /**
-  Build FSP SMBIOS memory info HOB
-
-  @param[in] VOID
-**/
-VOID
-BuildFspSmbiosMemoryInfoHob (
-  VOID
-  )
-{
-  FSP_SMBIOS_MEMORY_INFO      FspSmbiosMemoryInfo;
-  UINT8                       ChannelIndex;
-  UINT8                       ChannelCount;
-  UINT8                       DimmIndex;
-  UINT8                       DimmCount;
-
-  FspSmbiosMemoryInfo.Revision = 0x01;
-  FspSmbiosMemoryInfo.MemoryType = MemoryTypeDdr3;
-  FspSmbiosMemoryInfo.MemoryFrequencyInMHz = DDRFREQ_800MHZ;
-  FspSmbiosMemoryInfo.ErrorCorrectionType = ErrorDetectingMethodNone;
-
-  ChannelCount = 0;
-  for (ChannelIndex = 0; ChannelIndex < NUM_CHANNELS; ChannelIndex++) {
-    DimmCount = 0;
-    FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].ChannelId = ChannelIndex;
-    for (DimmIndex = 0; DimmIndex < MAX_SOCKETS; DimmIndex++) {
-      FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmInfo[DimmIndex].DimmId = DimmIndex;
-      //TODO: Update SizeInMb
-      FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmInfo[DimmIndex].SizeInMb = 128;
-        ///
-        /// Dimm is present in slot
-        /// Get the Memory DataWidth info
-        /// SPD Offset 8 Bits [2:0] DataWidth aka Primary Bus Width
-        ///
-        FspSmbiosMemoryInfo.DataWidth = 16;
-      DimmCount++;
-    }
-    FspSmbiosMemoryInfo.ChannelInfo[ChannelIndex].DimmCount = DimmCount;
-    ChannelCount++;
-  }
-  FspSmbiosMemoryInfo.ChannelCount = ChannelCount;
-
-  //
-  // Build HOB for FspSmbiosMemoryInfo
-  //
-  BuildGuidDataHob (
-    &gFspSmbiosMemoryInfoHobGuid,
-    &FspSmbiosMemoryInfo,
-    sizeof (FSP_SMBIOS_MEMORY_INFO)
-    );
-}
-
-/**
 This function will be called when MRC is done.
 
 @param  PeiServices General purpose services available to every PEIM.
@@ -465,10 +413,6 @@ IN VOID                       *Ppi
       BuildGuidDataHob (&gFspNonVolatileStorageHobGuid, (void *)((UINTN)GET_GUID_HOB_DATA (GuidHob) - sizeof (EFI_HOB_GUID_TYPE)), GET_GUID_HOB_DATA_SIZE (GuidHob) + sizeof (EFI_HOB_GUID_TYPE));
     }
   }
-
-  // Create SMBIOS Memory Info HOB
-  DEBUG((DEBUG_INFO | DEBUG_INIT, "BuildFspSmbiosMemoryInfoHob\n"));
-  BuildFspSmbiosMemoryInfoHob ();
 
   ApiMode = GetFspApiCallingMode();
   if (ApiMode != 0) {
