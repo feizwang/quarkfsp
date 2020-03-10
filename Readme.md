@@ -19,7 +19,7 @@ mv quarkfsp QuarkFspPkg
 ```
 
 HTTPS is also available:
-1. Go to https://review.gerrithub.io/#/admin/projects/LeeLeahy/quarkfsp
+1. Go to https://github.com/LeeLeahy/quarkfsp
 2. Click on "Clone with commit-msg hook" tab
 3. Click on http tab
 4. Copy the git clone string
